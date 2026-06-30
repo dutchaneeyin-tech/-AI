@@ -1,0 +1,81 @@
+function doPost(e) {
+  try {
+    var json = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // สร้างหัวข้อตารางหากยังไม่มีข้อมูล
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["ID", "ชื่อ-นามสกุล", "เบอร์โทรศัพท์", "ยอดหนี้ทั้งหมด (บาท)", "ชำระแล้ว (บาท)", "ยอดค้างชำระ (บาท)", "กำหนดชำระ", "สถานะ", "หมายเหตุ", "วันเวลาที่อัปเดตล่าสุด"]);
+    }
+    
+    var timestamp = new Date();
+    var outstanding = json.amount - json.paidAmount;
+    
+    // กรณีร้องขอลบข้อมูล
+    if (json.action === 'delete') {
+      var data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][0] === json.id) {
+          sheet.deleteRow(i + 1);
+          return ContentService.createTextOutput(JSON.stringify({
+            "status": "success",
+            "message": "ลบข้อมูลออกจาก Google Sheets สำเร็จ"
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        "status": "not_found",
+        "message": "ไม่พบข้อมูล ID นี้"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // ค้นหา ID เก่าเพื่อทำการแก้ไขข้อมูล
+    var data = sheet.getDataRange().getValues();
+    var idFound = false;
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === json.id) {
+        // แก้ไขข้อมูลในแถวนั้น
+        sheet.getRange(i + 1, 2, 1, 9).setValues([[
+          json.name,
+          json.phone,
+          json.amount,
+          json.paidAmount,
+          outstanding,
+          json.dueDate,
+          json.status,
+          json.notes,
+          timestamp
+        ]]);
+        idFound = true;
+        break;
+      }
+    }
+    
+    // หากไม่พบ ID เก่า ให้เพิ่มแถวใหม่ (Append Row)
+    if (!idFound) {
+      sheet.appendRow([
+        json.id,
+        json.name,
+        json.phone,
+        json.amount,
+        json.paidAmount,
+        outstanding,
+        json.dueDate,
+        json.status,
+        json.notes,
+        timestamp
+      ]);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "success",
+      "message": "บันทึกลง Google Sheets เรียบร้อยแล้ว"
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "error",
+      "message": error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบริหารข้อมูลลูกหนี้</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://script.google.com/macros/s/AKfycbzIl7QlDb6ohHzKr4H_m6O-dh1mRKj_smKwO__oaG2AAf2R2wkVXvHaP5L8Ti5DJz4j/exec" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dark-theme">
+    <!-- Background Elements for Visual Aesthetics -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-area">
+                                                      
+                <div class="header-actions">
+                   </div>
+            </div>
+        </header>
+		       <!-- Header -->
+        <header class="app-header">
+            <div class="logo-box">
+
+                <img src="logo.jpg"
+                     alt="กองทุนพัฒนาบทบาทสตรี"
+                     class="logo-img">
+
+                <div class="header-left">
+    
+    <div class="title-box">
+        <h1>ระบบบริหารข้อมูลลูกหนี้</h1>
+        <p>กองทุนพัฒนาบทบาทสตรี จังหวัดภูเก็ต</p>
+    </div>
+</div>
+
+                <div class="header-info">
+                    <span>ผู้ดูแลระบบ</span>
+                    <small>Debtor Management System</small>
+                </div>
+
+            </div>
+        </header>
+
+
+<div class="datetime-box">
+
+    <div class="date-item">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>วันที่ :</span>
+        <span id="currentDate"></span>
+    </div>
+
+    <div class="time-item">
+        <i class="fa-solid fa-clock"></i>
+        <span>เวลา :</span>
+        <span id="currentTime"></span>
+    </div>
+
+</div>
+
+</div>
+        <!-- Dashboard Summary Section -->
+        <section class="dashboard-section" aria-labelledby="dashboard-title">
+            <h2 id="dashboard-title" class="sr-only">แดชบอร์ดสรุปยอดหนี้</h2>
+            <div class="stats-grid">
+                <!-- Stat Card 1: Total Debt -->
+                <div class="stat-card total-debt">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ยอดหนี้รวมทั้งหมด</span>
+                        <span id="stat-total-debt" class="stat-value">0.00 ฿</span>
+                        <span class="stat-subtext" id="stat-total-count">ลูกหนี้ทั้งหมด 0 ราย</span>
+                    </div>
+                </div>
+                <!-- Stat Card 2: Paid Amount -->
+                <div class="stat-card total-paid">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ชำระแล้ว</span>
+                        <span id="stat-total-paid" class="stat-value">0.00 ฿</span>
+                        <span class="stat-subtext" id="stat-paid-percentage">คิดเป็น 0% ของทั้งหมด</span>
+                        <div class="progress-container">
+                            <div id="stat-paid-progress" class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stat Card 3: Outstanding Amount -->
+                <div class="stat-card total-outstanding">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ยอดค้างชำระสะสม</span>
+                        <span id="stat-total-outstanding" class="stat-value">0.00 ฿</span>
+                        <span class="stat-subtext" id="stat-outstanding-percentage">คงเหลือค้างชำระ 0%</span>
+                        <div class="progress-container">
+                            <div id="stat-outstanding-progress" class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+            <!-- Left Side: Add/Edit Form -->
+            <section class="form-container-card" aria-labelledby="form-card-title">
+                <div class="card-header">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <h2 id="form-card-title">บันทึก / แก้ไขข้อมูลลูกหนี้</h2>
+                </div>
+                
+                <form id="debtor-form" novalidate>
+                    <!-- Hidden input to keep track of edited item index/id -->
+                    <input type="hidden" id="debtor-id">
+                    <div class="form-group">
+                        <label for="debtor-name"><i class="fa-solid fa-user"></i> ชื่อ-นามสกุลลูกหนี้ <span class="required">*</span></label>
+                        <input type="text" id="debtor-name" required placeholder="เช่น สมชาย ใจดี">
+                        <span class="error-msg" id="name-error">กรุณากรอกชื่อ-นามสกุล</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="debtor-phone"><i class="fa-solid fa-phone"></i> เบอร์โทรศัพท์</label>
+                            <input type="tel" id="debtor-phone" placeholder="เช่น 0891234567" maxlength="10">
+                            <span class="error-msg" id="phone-error">เบอร์โทรศัพท์ควรเป็นตัวเลข 9-10 หลัก</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="debtor-due-date"><i class="fa-solid fa-calendar-days"></i> วันที่กำหนดชำระ <span class="required">*</span></label>
+                            <input type="date" id="debtor-due-date" required>
+                            <span class="error-msg" id="date-error">กรุณาเลือกวันที่กำหนดชำระ</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="debtor-amount"><i class="fa-solid fa-coins"></i> จำนวนยอดหนี้ (บาท) <span class="required">*</span></label>
+                            <input type="number" id="debtor-amount" min="0.01" step="0.01" required placeholder="เช่น 10000">
+                            <span class="error-msg" id="amount-error">กรุณากรอกจำนวนยอดหนี้ที่มากกว่า 0</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="debtor-paid"><i class="fa-solid fa-hand-holding-dollar"></i> ชำระแล้วชั่วคราว (บาท)</label>
+                            <input type="number" id="debtor-paid" min="0" step="0.01" value="0" placeholder="เช่น 2000">
+                            <span class="error-msg" id="paid-error">ยอดชำระแล้วต้องไม่ติดลบและไม่มากกว่ายอดหนี้</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-circle-question"></i> สถานะการชำระเงิน</label>
+                        <div class="status-selector-group">
+                            <button type="button" class="status-select-btn active" data-status="pending">
+                                <span class="dot dot-pending"></span>ค้างชำระ
+                            </button>
+                            <button type="button" class="status-select-btn" data-status="partial">
+                                <span class="dot dot-partial"></span>จ่ายบางส่วน
+                            </button>
+                            <button type="button" class="status-select-btn" data-status="paid">
+                                <span class="dot dot-paid"></span>ชำระครบแล้ว
+                            </button>
+                        </div>
+                        <input type="hidden" id="debtor-status" value="pending">
+                    </div>
+                    <div class="form-group">
+                        <label for="debtor-notes"><i class="fa-solid fa-comment-dots"></i> รายละเอียดเพิ่มเติม / หมายเหตุ</label>
+                        <textarea id="debtor-notes" rows="3" placeholder="ระบุเหตุผล หรือรายละเอียดเงินกู้..."></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> <span id="submit-btn-text">บันทึกข้อมูล</span>
+                        </button>
+                        <button type="button" id="reset-btn" class="btn btn-secondary">
+                            <i class="fa-solid fa-rotate-left"></i> ล้างข้อมูล
+                        </button>
+                    </div>
+                </form>
+            </section>
+            <!-- Right Side: Search and List Table -->
+            <section class="list-container-card" aria-labelledby="list-card-title">
+                <div class="card-header">
+                    <i class="fa-solid fa-list-check"></i>
+                    <h2 id="list-card-title">รายการข้อมูลลูกหนี้</h2>
+                </div>
+                <!-- Filters & Search Bar -->
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="ค้นหาชื่อ หรือเบอร์โทรศัพท์...">
+                    </div>
+                    <div class="status-filters">
+                        <button class="filter-tab active" data-filter="all">ทั้งหมด</button>
+                        <button class="filter-tab" data-filter="pending">ค้างชำระ</button>
+                        <button class="filter-tab" data-filter="partial">ค้างชำระบางส่วน</button>
+                        <button class="filter-tab" data-filter="paid">ชำระแล้ว</button>
+                    </div>
+                </div>
+                <!-- Table Content Wrapper -->
+                <div class="table-responsive">
+                    <table id="debtors-table">
+                        <thead>
+                            <tr>
+                                <th>ชื่อ</th>
+                                <th>เบอร์</th>
+                                <th>ยอดหนี้</th>
+                                <th>ยอดชำระ</th>
+                                <th>วันที่</th>
+                                <th>สถานะ</th>
+                                <th>หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="debtors-list-body">
+                            <!-- JS will inject rows here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <p class="empty-title">ไม่พบข้อมูลลูกหนี้</p>
+                    <p class="empty-desc">ลองบันทึกข้อมูลลูกหนี้ในแบบฟอร์มด้านซ้าย หรือล้างคำค้นหา</p>
+                </div>
+            </section>
+        </main>
+        <!-- Footer Section -->
+        <footer class="app-footer">
+        </footer>
+    </div>
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+    <!-- Custom Logic Script -->
+    <script src="app.js"></script>
+
+
+				<script>
+						function showDateTimeNow() {
+						const now = new Date();
+
+						const dateEl = document.getElementById("currentDate");
+						const timeEl = document.getElementById("currentTime");
+
+						if (dateEl) {
+							dateEl.innerText = now.toLocaleDateString("th-TH", {
+							day: "numeric",
+							month: "long",
+							year: "numeric"
+						});
+					}
+
+				if (timeEl) {
+						timeEl.innerText = now.toLocaleTimeString("th-TH", {
+						hour: "2-digit",
+						minute: "2-digit",
+						second: "2-digit",
+						hour12: false
+				}) + " น.";
+				}
+	}
+	showDateTimeNow();
+	setInterval(showDateTimeNow, 1000);
+</script>
+</body>
+</html>
+
