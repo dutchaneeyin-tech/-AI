@@ -75,13 +75,19 @@ body {
 }
 
 .logo-img,
-.logo {
-    width: 82px;
-    height: 82px;
-    object-fit: contain;
-    background: #fff;
-    padding: 5px;
-    border-radius: 16px;
+.logo img{
+    width:160px;
+    height:160px;
+    object-fit:contain;
+}
+
+@media (max-width:768px){
+
+.logo img{
+    width:70px;
+    height:70px;
+}
+
 }
 
 .logo-text h1,
